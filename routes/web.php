@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GuestController;
 use App\Http\Controllers\HousekeepingController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\LandingController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoomController;
@@ -14,10 +15,10 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-// Public landing → redirect to login or dashboard
-Route::get('/', function () {
-    return Auth::check() ? redirect()->route('dashboard') : redirect()->route('login');
-});
+// Public Landing Page & Online Reservations
+Route::get('/', [LandingController::class, 'index'])->name('landing');
+Route::post('/reserve', [LandingController::class, 'reserve'])->name('public.reserve');
+Route::post('/contact', [LandingController::class, 'contact'])->name('public.contact');
 
 // Idle logout (FR-1.4)
 Route::get('/logout-idle', function () {
