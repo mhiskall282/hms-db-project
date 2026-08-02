@@ -296,4 +296,53 @@ class HmsRequirementsTest extends TestCase
         $response->assertStatus(200);
         $response->assertViewHas('metrics');
     }
+
+    // ==========================================
+    // Public Landing Page & Online Reservations
+    // ==========================================
+
+    /** @test */
+    public function public_landing_page_renders_successfully()
+    {
+        $response = $this->get('/');
+        $response->assertStatus(200);
+        $response->assertSee('Grand Hotel');
+    }
+
+    /** @test */
+    public function public_guest_can_make_online_reservation()
+    {
+        $type = RoomType::create(['name' => 'Executive Suite', 'base_rate' => 200.00, 'capacity' => 2]);
+        $room = Room::create(['room_number' => '601', 'room_type_id' => $type->id, 'status' => 'available', 'floor' => 6]);
+
+        $response = $this->post('/reserve', [
+            'name'           => 'Jane Doe',
+            'phone'          => '+233241112222',
+            'email'          => 'jane@example.com',
+            'id_number'      => 'GHA-888777',
+            'nationality'    => 'Ghanaian',
+            'room_id'        => $room->id,
+            'check_in_date'  => today()->toDateString(),
+            'check_out_date' => today()->addDays(2)->toDateString(),
+        ]);
+
+        $response->assertRedirect('/#booking-search');
+        $response->assertSessionHas('booking_success');
+        $this->assertDatabaseHas('guests', ['id_number' => 'GHA-888777']);
+        $this->assertDatabaseHas('bookings', ['room_id' => $room->id, 'status' => 'confirmed']);
+    }
+
+    /** @test */
+    public function public_user_can_submit_contact_form()
+    {
+        $response = $this->post('/contact', [
+            'name'    => 'John Smith',
+            'email'   => 'john@example.com',
+            'subject' => 'Event Booking Inquiry',
+            'message' => 'Hello, I would like to inquire about booking the conference hall.',
+        ]);
+
+        $response->assertRedirect('/#contact');
+        $response->assertSessionHas('success');
+    }
 }
