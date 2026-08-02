@@ -18,6 +18,12 @@ fi
 mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache database
 chmod -R 777 storage database
 
+# Ensure valid APP_KEY exists before caching config
+if [ -z "$APP_KEY" ] || ! echo "$APP_KEY" | grep -q "^base64:"; then
+    echo "Generating base64 application key..."
+    php artisan key:generate --force
+fi
+
 # Run migrations automatically
 echo "Executing database migrations..."
 php artisan migrate --force
