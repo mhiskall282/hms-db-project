@@ -44,22 +44,28 @@
                 <p class="text-xs text-gray-600 mb-3">{{ $room->roomType->name }}</p>
 
                 <!-- Quick Action Buttons for Housekeeping -->
-                <div class="flex items-center gap-2">
+                <div class="flex flex-col gap-2">
                     @if($room->status === 'dirty')
-                    <form method="POST" action="{{ route('rooms.status', $room) }}" class="w-full">
-                        @csrf
-                        @method('PATCH')
-                        <input type="hidden" name="status" value="available">
-                        <button type="submit" class="w-full btn-primary btn-sm justify-center bg-green-600 hover:bg-green-700">
-                            ✓ Mark Cleaned & Available
-                        </button>
-                    </form>
+                    <div class="flex gap-2">
+                        <form method="POST" action="{{ route('rooms.status', $room) }}" class="flex-1">
+                            @csrf
+                            @method('PATCH')
+                            <input type="hidden" name="status" value="available">
+                            <button type="submit" class="w-full btn-primary btn-sm justify-center bg-green-600 hover:bg-green-700 text-xs py-1.5">
+                                ✓ Quick Clean
+                            </button>
+                        </form>
+
+                        <a href="{{ route('rooms.inspect.create', $room->id) }}" class="btn-accent text-xs px-3 py-1.5 justify-center">
+                            📋 5-Point Inspection
+                        </a>
+                    </div>
                     @elseif($room->status === 'maintenance')
                     <form method="POST" action="{{ route('rooms.status', $room) }}" class="w-full">
                         @csrf
                         @method('PATCH')
                         <input type="hidden" name="status" value="available">
-                        <button type="submit" class="w-full btn-primary btn-sm justify-center">
+                        <button type="submit" class="w-full btn-primary btn-sm justify-center text-xs py-1.5">
                             ✓ Maintenance Resolved
                         </button>
                     </form>

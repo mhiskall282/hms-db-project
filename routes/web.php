@@ -18,10 +18,14 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\GuestReviewController;
+use App\Http\Controllers\RoomInspectionController;
+
 // Public Landing Page & Online Reservations
 Route::get('/', [LandingController::class, 'index'])->name('landing');
 Route::post('/reserve', [LandingController::class, 'reserve'])->name('public.reserve');
 Route::post('/contact', [LandingController::class, 'contact'])->name('public.contact');
+Route::post('/review', [GuestReviewController::class, 'storePublic'])->name('public.review');
 
 // Public Guest Self-Service Portal
 Route::get('/portal', [GuestPortalController::class, 'lookupForm'])->name('portal.lookup');
@@ -89,11 +93,21 @@ Route::middleware('auth')->group(function () {
     });
 
     // ----------------------------------------------------------
-    // Housekeeping (Housekeeping, Admin, Manager — FR-2.3)
+    // Housekeeping & Quality Inspections (Housekeeping, Admin, Manager — FR-2.3)
     // ----------------------------------------------------------
     Route::middleware('role:admin|manager|housekeeping')->group(function () {
         Route::get('housekeeping', [HousekeepingController::class, 'index'])->name('housekeeping.index');
         Route::patch('rooms/{room}/status', [HousekeepingController::class, 'updateStatus'])->name('rooms.status');
+        Route::get('rooms/{room}/inspect', [RoomInspectionController::class, 'create'])->name('rooms.inspect.create');
+        Route::post('rooms/{room}/inspect', [RoomInspectionController::class, 'store'])->name('rooms.inspect.store');
+    });
+
+    // ----------------------------------------------------------
+    // Guest Reviews Moderation (Manager, Admin, Receptionist)
+    // ----------------------------------------------------------
+    Route::middleware('role:admin|manager|receptionist')->group(function () {
+        Route::get('reviews', [GuestReviewController::class, 'index'])->name('reviews.index');
+        Route::patch('reviews/{review}/toggle', [GuestReviewController::class, 'togglePublish'])->name('reviews.toggle');
     });
 
     // ----------------------------------------------------------

@@ -29,6 +29,7 @@
                 <thead>
                     <tr>
                         <th>Guest Name</th>
+                        <th>VIP Loyalty Tier</th>
                         <th>Phone</th>
                         <th>Email</th>
                         <th>ID Number</th>
@@ -41,6 +42,12 @@
                     <tr>
                         <td class="font-semibold text-primary">
                             <a href="{{ route('guests.show', $guest) }}" class="hover:underline">{{ $guest->name }}</a>
+                        </td>
+                        <td>
+                            <span class="badge text-xs uppercase font-bold px-2 py-0.5
+                                {{ $guest->loyalty_tier === 'Platinum VIP' ? 'bg-purple-500/20 text-purple-400 border-purple-500/40' : ($guest->loyalty_tier === 'Gold VIP' ? 'bg-amber-500/20 text-amber-400 border-amber-500/40' : ($guest->loyalty_tier === 'Silver Member' ? 'bg-slate-500/20 text-slate-300 border-slate-500/40' : 'bg-blue-500/20 text-blue-400 border-blue-500/40')) }}">
+                                👑 {{ $guest->loyalty_tier }} ({{ $guest->discount_percentage }}% Off)
+                            </span>
                         </td>
                         <td class="font-mono text-xs">{{ $guest->phone }}</td>
                         <td class="text-xs text-gray-600">{{ $guest->email ?? '—' }}</td>
