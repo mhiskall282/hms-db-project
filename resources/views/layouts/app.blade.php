@@ -72,6 +72,13 @@
             </a>
             @endrole
 
+            @role('admin|manager|housekeeping|receptionist')
+            <a href="{{ route('maintenance.index') }}" class="sidebar-nav-item {{ request()->routeIs('maintenance.*') ? 'active' : '' }}">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"/></svg>
+                Maintenance
+            </a>
+            @endrole
+
             @role('admin|manager|accountant')
             <a href="{{ route('invoices.index') }}" class="sidebar-nav-item {{ request()->routeIs('invoices.*') ? 'active' : '' }}">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
@@ -80,19 +87,18 @@
             @endrole
 
             @role('admin|manager')
-            <div class="pt-4 pb-1 px-4"><p class="text-gray-500 text-xs uppercase tracking-widest font-semibold">Reports</p></div>
+            <div class="pt-4 pb-1 px-4"><p class="text-gray-500 text-xs uppercase tracking-widest font-semibold">Reports & Security</p></div>
             <a href="{{ route('reports.occupancy') }}" class="sidebar-nav-item {{ request()->routeIs('reports.occupancy*') ? 'active' : '' }}">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-                Occupancy
+                Occupancy Report
             </a>
             <a href="{{ route('reports.revenue') }}" class="sidebar-nav-item {{ request()->routeIs('reports.revenue*') ? 'active' : '' }}">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                Revenue
+                Revenue Report
             </a>
-            <div class="pt-4 pb-1 px-4"><p class="text-gray-500 text-xs uppercase tracking-widest font-semibold">Configuration</p></div>
-            <a href="{{ route('room-types.index') }}" class="sidebar-nav-item {{ request()->routeIs('room-types.*') ? 'active' : '' }}">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-                Room Types
+            <a href="{{ route('audit-logs.index') }}" class="sidebar-nav-item {{ request()->routeIs('audit-logs.*') ? 'active' : '' }}">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                Audit Trail
             </a>
             @endrole
 

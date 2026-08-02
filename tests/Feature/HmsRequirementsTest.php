@@ -345,4 +345,75 @@ class HmsRequirementsTest extends TestCase
         $response->assertRedirect('/#contact');
         $response->assertSessionHas('success');
     }
+
+    // ==========================================
+    // Advanced Features: Guest Portal, Maintenance, Audit Logs
+    // ==========================================
+
+    /** @test */
+    public function guest_can_lookup_booking_in_self_service_portal()
+    {
+        $type = RoomType::create(['name' => 'Suite', 'base_rate' => 150.00, 'capacity' => 2]);
+        $room = Room::create(['room_number' => '701', 'room_type_id' => $type->id, 'status' => 'available', 'floor' => 7]);
+        $guest = Guest::create(['name' => 'Kofi Annan', 'phone' => '+233201234567', 'id_number' => 'GHA-PORTAL-01', 'nationality' => 'Ghanaian']);
+
+        $booking = Booking::create([
+            'booking_reference' => 'HMS-PORTAL01',
+            'guest_id'          => $guest->id,
+            'room_id'           => $room->id,
+            'check_in_date'     => today()->toDateString(),
+            'check_out_date'    => today()->addDays(2)->toDateString(),
+            'status'            => 'confirmed',
+            'created_by'        => $this->receptionist->id,
+        ]);
+
+        $response = $this->post('/portal/search', [
+            'booking_reference' => 'HMS-PORTAL01',
+            'contact'           => '+233201234567',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertSee('HMS-PORTAL01');
+        $response->assertSee('Kofi Annan');
+    }
+
+    /** @test */
+    public function staff_can_create_and_resolve_room_maintenance_ticket()
+    {
+        $type = RoomType::create(['name' => 'Standard', 'base_rate' => 100.00, 'capacity' => 2]);
+        $room = Room::create(['room_number' => '702', 'room_type_id' => $type->id, 'status' => 'available', 'floor' => 7]);
+
+        // 1. Report Maintenance
+        $response = $this->actingAs($this->housekeeper)->post('/maintenance', [
+            'room_id'     => $room->id,
+            'issue_title' => 'Air Conditioner Leaking',
+            'priority'    => 'high',
+            'description' => 'Water leaking from AC unit onto desk.',
+        ]);
+
+        $response->assertRedirect('/maintenance');
+        $this->assertDatabaseHas('rooms', ['id' => $room->id, 'status' => 'maintenance']);
+        $this->assertDatabaseHas('maintenance_requests', ['room_id' => $room->id, 'status' => 'open']);
+
+        $ticket = \App\Models\MaintenanceRequest::where('room_id', $room->id)->first();
+
+        // 2. Resolve Maintenance
+        $resolveResponse = $this->actingAs($this->housekeeper)->patch("/maintenance/{$ticket->id}/resolve", [
+            'resolution_notes' => 'Replaced AC filter and drain pipe.',
+        ]);
+
+        $resolveResponse->assertRedirect('/maintenance');
+        $this->assertDatabaseHas('rooms', ['id' => $room->id, 'status' => 'available']);
+        $this->assertDatabaseHas('maintenance_requests', ['id' => $ticket->id, 'status' => 'resolved']);
+    }
+
+    /** @test */
+    public function admin_can_view_security_audit_logs()
+    {
+        \App\Models\AuditLog::log('auth', 'user.login', 'Admin logged in to system');
+
+        $response = $this->actingAs($this->admin)->get('/audit-logs');
+        $response->assertStatus(200);
+        $response->assertSee('Admin logged in to system');
+    }
 }

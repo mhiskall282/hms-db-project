@@ -1,12 +1,15 @@
 <?php
 
+use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\CheckInOutController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GuestController;
+use App\Http\Controllers\GuestPortalController;
 use App\Http\Controllers\HousekeepingController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoomController;
@@ -19,6 +22,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [LandingController::class, 'index'])->name('landing');
 Route::post('/reserve', [LandingController::class, 'reserve'])->name('public.reserve');
 Route::post('/contact', [LandingController::class, 'contact'])->name('public.contact');
+
+// Public Guest Self-Service Portal
+Route::get('/portal', [GuestPortalController::class, 'lookupForm'])->name('portal.lookup');
+Route::post('/portal/search', [GuestPortalController::class, 'search'])->name('portal.search');
+Route::get('/portal/invoice/{booking}/download', [GuestPortalController::class, 'downloadPdf'])->name('portal.invoice.download');
 
 // Idle logout (FR-1.4)
 Route::get('/logout-idle', function () {
@@ -40,6 +48,22 @@ Route::middleware('auth')->group(function () {
 
     // Dashboard — all authenticated staff (FR-7.3)
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // ----------------------------------------------------------
+    // Maintenance Ticketing (Housekeeping, Admin, Manager, Receptionist)
+    // ----------------------------------------------------------
+    Route::middleware('role:admin|manager|housekeeping|receptionist')->group(function () {
+        Route::get('maintenance', [MaintenanceController::class, 'index'])->name('maintenance.index');
+        Route::post('maintenance', [MaintenanceController::class, 'store'])->name('maintenance.store');
+        Route::patch('maintenance/{maintenanceRequest}/resolve', [MaintenanceController::class, 'resolve'])->name('maintenance.resolve');
+    });
+
+    // ----------------------------------------------------------
+    // Security Audit Logs (Admin, Manager)
+    // ----------------------------------------------------------
+    Route::middleware('role:admin|manager')->group(function () {
+        Route::get('audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
+    });
 
     // ----------------------------------------------------------
     // Room Types (Manager, Admin — FR-2.1)
