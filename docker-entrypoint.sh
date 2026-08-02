@@ -3,6 +3,16 @@ set -e
 
 echo "=== HMS Docker Container Starting ==="
 
+# Ensure .env file exists in container
+if [ ! -f /var/www/html/.env ]; then
+    echo "Creating .env file from .env.example..."
+    cp /var/www/html/.env.example /var/www/html/.env
+fi
+
+# Ensure storage directories exist and are writable
+mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache database
+chmod -R 777 storage database
+
 # Handle Database Configuration for Render
 if [ "$DB_CONNECTION" = "sqlite" ] || [ -z "$DB_HOST" ]; then
     echo "Configuring SQLite database..."
@@ -13,10 +23,6 @@ if [ "$DB_CONNECTION" = "sqlite" ] || [ -z "$DB_HOST" ]; then
         echo "Created SQLite database file at $DB_DATABASE"
     fi
 fi
-
-# Ensure storage directories exist and are writable
-mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache database
-chmod -R 777 storage database
 
 # Ensure valid APP_KEY exists before caching config
 if [ -z "$APP_KEY" ] || ! echo "$APP_KEY" | grep -q "^base64:"; then
