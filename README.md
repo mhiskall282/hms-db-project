@@ -1,5 +1,9 @@
 # Hotel Management System (HMS) — Final Year Project
 
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Render-brightgreen?style=for-the-badge&logo=render)](https://hms-hotel-management-system.onrender.com)
+
+**Live Production URL:** [https://hms-hotel-management-system.onrender.com](https://hms-hotel-management-system.onrender.com)
+
 A comprehensive, multi-role **Hotel Management System (HMS)** built with **Laravel 11**, **Spatie Laravel Permission**, **Alpine.js**, and **Tailwind CSS v3**.
 
 This system digitises the complete operational lifecycle of a single hotel property — from room-type configuration and inventory management, guest registration, and availability searching to reservation booking, front-desk check-in/out, itemized invoicing, payment collection, and management reporting.

@@ -3,28 +3,26 @@ set -e
 
 echo "=== HMS Docker Container Starting ==="
 
-# Ensure .env file exists in container
+# Create database directory & SQLite file if needed
+mkdir -p /var/www/html/database /var/www/html/storage/framework/sessions /var/www/html/storage/framework/views /var/www/html/storage/framework/cache /var/www/html/storage/logs
+if [ ! -f /var/www/html/database/database.sqlite ]; then
+    touch /var/www/html/database/database.sqlite
+    echo "Created SQLite database file at /var/www/html/database/database.sqlite"
+fi
+
+# Ensure writable permissions
+chmod -R 777 /var/www/html/storage /var/www/html/database /var/www/html/database/database.sqlite
+
+# Create .env from .env.example if missing
 if [ ! -f /var/www/html/.env ]; then
     echo "Creating .env file from .env.example..."
     cp /var/www/html/.env.example /var/www/html/.env
 fi
 
-# Ensure storage directories exist and are writable
-mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache database
-chmod -R 777 storage database
+# Clear any stale config cache first
+php artisan config:clear || true
 
-# Handle Database Configuration for Render
-if [ "$DB_CONNECTION" = "sqlite" ] || [ -z "$DB_HOST" ]; then
-    echo "Configuring SQLite database..."
-    export DB_CONNECTION=sqlite
-    export DB_DATABASE=/var/www/html/database/database.sqlite
-    if [ ! -f "$DB_DATABASE" ]; then
-        touch "$DB_DATABASE"
-        echo "Created SQLite database file at $DB_DATABASE"
-    fi
-fi
-
-# Ensure valid APP_KEY exists before caching config
+# Ensure valid APP_KEY exists
 if [ -z "$APP_KEY" ] || ! echo "$APP_KEY" | grep -q "^base64:"; then
     echo "Generating base64 application key..."
     php artisan key:generate --force
