@@ -15,12 +15,38 @@
     <!-- Scripts & Styles -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="font-sans antialiased bg-surface-muted" x-data="idleTimer()" x-init="startTimer()" @mousemove="resetTimer()" @keydown.window="resetTimer()" @click="resetTimer()">
+<body class="font-sans antialiased bg-surface-muted min-h-screen" x-data="{ sidebarOpen: false, ...idleTimer() }" x-init="startTimer()" @mousemove="resetTimer()" @keydown.window="resetTimer()" @click="resetTimer()">
 
-    <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
+    <!-- Mobile Navigation Top Bar (Visible < lg screens) -->
+    <div class="lg:hidden bg-primary text-white p-4 sticky top-0 z-30 flex justify-between items-center border-b border-primary-light shadow-md">
+        <div class="flex items-center gap-3">
+            <button type="button" @click="sidebarOpen = !sidebarOpen" aria-label="Toggle Staff Navigation" class="p-1.5 rounded-lg bg-primary-light text-white focus:outline-none hover:bg-accent hover:text-primary transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path x-show="!sidebarOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    <path x-show="sidebarOpen" x-cloak stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+            <div class="flex items-center gap-2">
+                <div class="w-7 h-7 bg-accent rounded flex items-center justify-center text-primary font-black text-sm">H</div>
+                <span class="font-bold text-sm tracking-tight text-white">{{ config('hms.hotel_name') }}</span>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <span class="text-xs text-accent font-semibold capitalize bg-primary-light px-2.5 py-1 rounded-full">{{ auth()->user()->getRoleNames()->first() ?? 'Staff' }}</span>
+            <a href="{{ route('profile.edit') }}" class="w-7 h-7 bg-accent text-primary rounded-full flex items-center justify-center text-xs font-bold">
+                {{ substr(auth()->user()->name, 0, 1) }}
+            </a>
+        </div>
+    </div>
+
+    <!-- Mobile Dark Backdrop Overlay -->
+    <div x-show="sidebarOpen" @click="sidebarOpen = false" x-transition.opacity class="fixed inset-0 bg-slate-950/70 z-30 backdrop-blur-sm lg:hidden" x-cloak></div>
+
+    <!-- Sidebar (Drawer on mobile, fixed on desktop) -->
+    <aside class="sidebar" :class="{ 'mobile-open': sidebarOpen }" id="sidebar">
         <!-- Logo -->
-        <div class="sidebar-logo">
+        <div class="sidebar-logo flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="w-9 h-9 bg-accent rounded-lg flex items-center justify-center text-primary font-bold text-lg">H</div>
                 <div>
@@ -28,6 +54,8 @@
                     <p class="text-gray-400 text-xs">Management System</p>
                 </div>
             </div>
+            <!-- Close Button for Mobile -->
+            <button type="button" @click="sidebarOpen = false" class="lg:hidden text-gray-400 hover:text-white">&times;</button>
         </div>
 
         <!-- User Info -->
@@ -37,50 +65,50 @@
         </div>
 
         <!-- Navigation -->
-        <nav class="flex-1 py-4 overflow-y-auto">
-            <a href="{{ route('dashboard') }}" class="sidebar-nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+        <nav class="flex-1 py-4 overflow-y-auto space-y-0.5">
+            <a href="{{ route('dashboard') }}" @click="sidebarOpen = false" class="sidebar-nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                 Dashboard
             </a>
 
             @role('admin|manager|receptionist')
-            <a href="{{ route('check-in-out.index') }}" class="sidebar-nav-item {{ request()->routeIs('check-in-out.*') ? 'active' : '' }}">
+            <a href="{{ route('check-in-out.index') }}" @click="sidebarOpen = false" class="sidebar-nav-item {{ request()->routeIs('check-in-out.*') ? 'active' : '' }}">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/></svg>
                 Check-In / Out
             </a>
-            <a href="{{ route('bookings.index') }}" class="sidebar-nav-item {{ request()->routeIs('bookings.*') ? 'active' : '' }}">
+            <a href="{{ route('bookings.index') }}" @click="sidebarOpen = false" class="sidebar-nav-item {{ request()->routeIs('bookings.*') ? 'active' : '' }}">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                 Bookings
             </a>
-            <a href="{{ route('guests.index') }}" class="sidebar-nav-item {{ request()->routeIs('guests.*') ? 'active' : '' }}">
+            <a href="{{ route('guests.index') }}" @click="sidebarOpen = false" class="sidebar-nav-item {{ request()->routeIs('guests.*') ? 'active' : '' }}">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                 Guests
             </a>
             @endrole
 
             @role('admin|manager|receptionist|housekeeping')
-            <a href="{{ route('rooms.index') }}" class="sidebar-nav-item {{ request()->routeIs('rooms.*') ? 'active' : '' }}">
+            <a href="{{ route('rooms.index') }}" @click="sidebarOpen = false" class="sidebar-nav-item {{ request()->routeIs('rooms.*') ? 'active' : '' }}">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
                 Rooms
             </a>
             @endrole
 
             @role('admin|manager|housekeeping')
-            <a href="{{ route('housekeeping.index') }}" class="sidebar-nav-item {{ request()->routeIs('housekeeping.*') ? 'active' : '' }}">
+            <a href="{{ route('housekeeping.index') }}" @click="sidebarOpen = false" class="sidebar-nav-item {{ request()->routeIs('housekeeping.*') ? 'active' : '' }}">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
                 Housekeeping
             </a>
             @endrole
 
             @role('admin|manager|housekeeping|receptionist')
-            <a href="{{ route('maintenance.index') }}" class="sidebar-nav-item {{ request()->routeIs('maintenance.*') ? 'active' : '' }}">
+            <a href="{{ route('maintenance.index') }}" @click="sidebarOpen = false" class="sidebar-nav-item {{ request()->routeIs('maintenance.*') ? 'active' : '' }}">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"/></svg>
                 Maintenance
             </a>
             @endrole
 
             @role('admin|manager|accountant')
-            <a href="{{ route('invoices.index') }}" class="sidebar-nav-item {{ request()->routeIs('invoices.*') ? 'active' : '' }}">
+            <a href="{{ route('invoices.index') }}" @click="sidebarOpen = false" class="sidebar-nav-item {{ request()->routeIs('invoices.*') ? 'active' : '' }}">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                 Invoices
             </a>
@@ -88,29 +116,29 @@
 
             @role('admin|manager')
             <div class="pt-4 pb-1 px-4"><p class="text-gray-500 text-xs uppercase tracking-widest font-semibold">Reports & Security</p></div>
-            <a href="{{ route('reports.occupancy') }}" class="sidebar-nav-item {{ request()->routeIs('reports.occupancy*') ? 'active' : '' }}">
+            <a href="{{ route('reports.occupancy') }}" @click="sidebarOpen = false" class="sidebar-nav-item {{ request()->routeIs('reports.occupancy*') ? 'active' : '' }}">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                 Occupancy Report
             </a>
-            <a href="{{ route('reports.revenue') }}" class="sidebar-nav-item {{ request()->routeIs('reports.revenue*') ? 'active' : '' }}">
+            <a href="{{ route('reports.revenue') }}" @click="sidebarOpen = false" class="sidebar-nav-item {{ request()->routeIs('reports.revenue*') ? 'active' : '' }}">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 Revenue Report
             </a>
-            <a href="{{ route('audit-logs.index') }}" class="sidebar-nav-item {{ request()->routeIs('audit-logs.*') ? 'active' : '' }}">
+            <a href="{{ route('audit-logs.index') }}" @click="sidebarOpen = false" class="sidebar-nav-item {{ request()->routeIs('audit-logs.*') ? 'active' : '' }}">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                 Audit Trail
             </a>
             @endrole
 
             @role('admin|manager|accountant')
-            <a href="{{ route('reports.outstanding') }}" class="sidebar-nav-item {{ request()->routeIs('reports.outstanding*') ? 'active' : '' }}">
+            <a href="{{ route('reports.outstanding') }}" @click="sidebarOpen = false" class="sidebar-nav-item {{ request()->routeIs('reports.outstanding*') ? 'active' : '' }}">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                 Outstanding
             </a>
             @endrole
 
             @role('admin')
-            <a href="{{ route('users.index') }}" class="sidebar-nav-item {{ request()->routeIs('users.*') ? 'active' : '' }}">
+            <a href="{{ route('users.index') }}" @click="sidebarOpen = false" class="sidebar-nav-item {{ request()->routeIs('users.*') ? 'active' : '' }}">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                 Staff Accounts
             </a>
@@ -131,8 +159,8 @@
 
     <!-- Main Content Area -->
     <div class="content-area">
-        <!-- Page Header -->
-        <header class="page-header sticky top-0 z-20">
+        <!-- Desktop Header (Hidden on Mobile) -->
+        <header class="page-header sticky top-0 z-20 hidden lg:flex">
             <div class="flex items-center gap-4">
                 <h1 class="page-title">{{ $title ?? 'Dashboard' }}</h1>
             </div>
@@ -145,7 +173,7 @@
         </header>
 
         <!-- Flash Messages -->
-        <div class="px-6 pt-4">
+        <div class="px-4 sm:px-6 pt-4">
             @if(session('success'))
                 <div class="alert alert-success">
                     <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -167,12 +195,12 @@
         </div>
 
         <!-- Page Content -->
-        <main class="page-content">
+        <main class="page-content px-4 sm:px-6 py-6">
             {{ $slot }}
         </main>
 
         <!-- Footer -->
-        <footer class="px-6 py-4 text-center text-xs text-gray-400 border-t border-hms-border bg-white">
+        <footer class="px-4 sm:px-6 py-4 text-center text-xs text-gray-400 border-t border-hms-border bg-white">
             &copy; {{ date('Y') }} {{ config('hms.hotel_name') }} — HMS &middot; ICT Education Final Year Project
         </footer>
     </div>

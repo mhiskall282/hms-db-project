@@ -16,7 +16,7 @@
 <body class="font-sans antialiased bg-slate-900 text-slate-100 selection:bg-accent selection:text-primary">
 
     <!-- Sticky Navigation Bar -->
-    <header class="fixed top-0 left-0 right-0 z-50 bg-primary/80 backdrop-blur-md border-b border-white/10 transition-all">
+    <header x-data="{ mobileMenuOpen: false }" class="fixed top-0 left-0 right-0 z-50 bg-primary/95 backdrop-blur-md border-b border-white/10 transition-all">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
             <!-- Brand Logo -->
             <a href="#" class="flex items-center gap-3 group">
@@ -29,27 +29,63 @@
                 </div>
             </a>
 
-            <!-- Navigation Links -->
+            <!-- Desktop Navigation Links -->
             <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
                 <a href="#about" class="hover:text-accent transition-colors">About Us</a>
                 <a href="#booking-search" class="hover:text-accent transition-colors">Find Rooms</a>
                 <a href="#suites" class="hover:text-accent transition-colors">Suites</a>
                 <a href="#amenities" class="hover:text-accent transition-colors">Amenities</a>
+                <a href="{{ route('portal.lookup') }}" class="hover:text-accent transition-colors">Guest Portal</a>
                 <a href="#contact" class="hover:text-accent transition-colors">Contact</a>
             </nav>
 
-            <!-- Actions -->
+            <!-- Actions (Desktop & Mobile) -->
             <div class="flex items-center gap-3">
+                <div class="hidden sm:flex items-center gap-3">
+                    @auth
+                        <a href="{{ route('dashboard') }}" class="btn-accent text-xs px-4 py-2">
+                            Dashboard &rarr;
+                        </a>
+                    @else
+                        <a href="{{ route('login') }}" class="text-xs text-slate-300 hover:text-white font-semibold px-3 py-2 border border-white/20 rounded-lg hover:border-accent transition">
+                            Staff Login
+                        </a>
+                        <a href="#booking-search" class="btn-accent text-xs px-4 py-2 shadow-lg shadow-accent/20">
+                            Book Now
+                        </a>
+                    @endauth
+                </div>
+
+                <!-- Mobile Hamburger Button -->
+                <button type="button" @click="mobileMenuOpen = !mobileMenuOpen" aria-label="Toggle Navigation Menu" class="md:hidden p-2 rounded-xl text-slate-300 hover:text-white hover:bg-white/10 focus:outline-none transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path x-show="!mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        <path x-show="mobileMenuOpen" x-cloak stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Responsive Mobile Dropdown Menu -->
+        <div x-show="mobileMenuOpen" x-transition.origin.top class="md:hidden bg-slate-900/95 border-b border-white/10 px-4 pt-3 pb-6 space-y-3 backdrop-blur-xl" x-cloak>
+            <a href="#about" @click="mobileMenuOpen = false" class="block py-2 text-sm font-semibold text-slate-200 hover:text-accent border-b border-white/5">About Us</a>
+            <a href="#booking-search" @click="mobileMenuOpen = false" class="block py-2 text-sm font-semibold text-slate-200 hover:text-accent border-b border-white/5">Find Rooms & Reserve</a>
+            <a href="#suites" @click="mobileMenuOpen = false" class="block py-2 text-sm font-semibold text-slate-200 hover:text-accent border-b border-white/5">Luxury Suites</a>
+            <a href="#amenities" @click="mobileMenuOpen = false" class="block py-2 text-sm font-semibold text-slate-200 hover:text-accent border-b border-white/5">Hotel Amenities</a>
+            <a href="{{ route('portal.lookup') }}" class="block py-2 text-sm font-semibold text-accent hover:underline border-b border-white/5">🔍 Guest Self-Service Portal</a>
+            <a href="#contact" @click="mobileMenuOpen = false" class="block py-2 text-sm font-semibold text-slate-200 hover:text-accent border-b border-white/5">Contact Concierge</a>
+
+            <div class="pt-3 flex flex-col gap-2">
                 @auth
-                    <a href="{{ route('dashboard') }}" class="btn-accent text-xs px-4 py-2">
-                        Dashboard &rarr;
+                    <a href="{{ route('dashboard') }}" class="btn-accent text-xs justify-center py-2.5">
+                        Staff Dashboard &rarr;
                     </a>
                 @else
-                    <a href="{{ route('login') }}" class="text-xs text-slate-300 hover:text-white font-semibold px-3 py-2 border border-white/20 rounded-lg hover:border-accent transition">
-                        Staff Login
+                    <a href="#booking-search" @click="mobileMenuOpen = false" class="btn-accent text-xs justify-center py-2.5 shadow-lg shadow-accent/20">
+                        Book Room Now
                     </a>
-                    <a href="#booking-search" class="btn-accent text-xs px-4 py-2 shadow-lg shadow-accent/20">
-                        Book Now
+                    <a href="{{ route('login') }}" class="text-xs text-center text-slate-300 font-semibold py-2.5 border border-white/20 rounded-xl hover:border-accent">
+                        Staff Portal Login
                     </a>
                 @endauth
             </div>
