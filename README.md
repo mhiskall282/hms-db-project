@@ -23,23 +23,48 @@ This system digitises the complete operational lifecycle of a single hotel prope
 ## 🛠️ Technology Stack
 
 - **Backend Framework:** Laravel 11 (PHP 8.2+)
-- **Database:** MySQL / MariaDB (via Eloquent ORM & Migrations)
+- **Database:** MySQL / MariaDB (or SQLite for cloud deployments)
 - **RBAC:** `spatie/laravel-permission` (v6.25)
 - **Frontend Stack:** Laravel Blade + Alpine.js + Tailwind CSS v3
 - **PDF Export:** `barryvdh/laravel-dompdf` (v3.1)
 - **CSV Export:** `maatwebsite/excel` (v3.1)
+- **Deployment:** Docker + Render Blueprint (`render.yaml`)
 - **Test Suite:** PHPUnit / Pest (37 passed feature & unit tests)
 
 ---
 
-## 📋 Step-by-Step Installation & Setup Guide
+## 🚀 Deployment on Render (Step-by-Step)
+
+This repository includes a pre-configured `Dockerfile`, `docker-entrypoint.sh`, and `render.yaml` Blueprint for 1-click or automated deployment on **Render.com**.
+
+### Option A: Using Render Blueprints (Recommended)
+1. Push this repository to your GitHub account.
+2. Log in to [Render Dashboard](https://dashboard.render.com/).
+3. Click **New +** &rarr; **Blueprint**.
+4. Connect your `hms-db-project` repository.
+5. Render will automatically detect `render.yaml` and provision the Docker web service.
+6. Click **Apply**. Render will build the image, run database setup & seeders, and launch the application live!
+
+### Option B: Manual Web Service Setup on Render
+1. Click **New +** &rarr; **Web Service**.
+2. Select **Build and deploy from a Git repository**.
+3. Choose Language: **Docker**.
+4. Environment Variables:
+   - `APP_ENV`: `production`
+   - `APP_DEBUG`: `false`
+   - `APP_KEY`: *(Generate using `php artisan key:generate --show`)*
+   - `DB_CONNECTION`: `sqlite` *(or `mysql` if connecting a Render MySQL instance)*
+5. Click **Create Web Service**. The container handles database auto-creation, migrations, seeding, and dynamic `$PORT` binding automatically upon startup.
+
+---
+
+## 📋 Step-by-Step Local Installation Guide
 
 ### Prerequisites
-Make sure you have the following installed on your machine:
-- **PHP** >= 8.2 with `gd`, `pdo_mysql`, `mbstring`, `openssl`, `tokenizer`, `xml`, `ctype`, `json` extensions enabled.
+- **PHP** >= 8.2 with `gd`, `pdo_mysql`, `mbstring`, `openssl`, `tokenizer`, `xml`, `ctype`, `json` extensions.
 - **Composer** >= 2.0
 - **Node.js** >= 20.0 and **npm**
-- **MySQL** / **MariaDB** server (e.g. via XAMPP or native service)
+- **MySQL** / **MariaDB** server (e.g. via XAMPP)
 
 ---
 
@@ -53,22 +78,19 @@ cd hms-db-project
 
 ### Step 2: Install PHP & Node Dependencies
 ```bash
-# Install PHP packages
 composer install
-
-# Install Frontend dependencies
 npm install
 ```
 
 ---
 
 ### Step 3: Configure Environment File
-Copy the `.env.example` file to create `.env`:
+Copy `.env.example` to create `.env`:
 ```bash
 cp .env.example .env
 ```
 
-Open `.env` and verify/update your MySQL database credentials:
+Configure your database credentials in `.env`:
 ```env
 APP_NAME="Hotel Management System"
 APP_ENV=local
@@ -84,7 +106,7 @@ DB_USERNAME=root
 DB_PASSWORD=
 ```
 
-Generate the Laravel application key:
+Generate application key:
 ```bash
 php artisan key:generate
 ```
@@ -92,29 +114,27 @@ php artisan key:generate
 ---
 
 ### Step 4: Database Setup & Migration
-Create the database `hms_db` in your MySQL server if it does not already exist, then run all database migrations:
 ```bash
 php artisan migrate
 ```
 
 ---
 
-### Step 5: Seed the Database with Demo Data
-Seed the database with roles, staff accounts, room types, rooms, guests, and full demo booking lifecycles:
+### Step 5: Seed the Database
 ```bash
 php artisan db:seed
 ```
 
 ---
 
-### Step 6: Build Assets & Start Development Server
+### Step 6: Build Assets & Start Server
 
-In one terminal, compile frontend assets with Vite:
+Compile frontend assets:
 ```bash
 npm run build
 ```
 
-In another terminal, start the Laravel development server:
+Start the Laravel development server:
 ```bash
 php artisan serve
 ```
@@ -125,7 +145,7 @@ Visit **`http://localhost:8000`** in your browser.
 
 ## 🔑 Pre-Seeded Staff Login Credentials
 
-All accounts are pre-seeded with the password: **`password`**
+All accounts are pre-seeded with password: **`password`**
 
 | Role | Email Login | System Scope & Permissions |
 |------|-------------|----------------------------|

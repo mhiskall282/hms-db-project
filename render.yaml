@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: hms-hotel-management-system
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: Dockerfile
+    autoDeploy: true
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_KEY
+        generateValue: true
+      - key: DB_CONNECTION
+        value: sqlite
+      - key: HMS_HOTEL_NAME
+        value: "Grand Hotel HMS"
+      - key: HMS_HOTEL_ADDRESS
+        value: "Accra, Ghana"
+      - key: HMS_HOTEL_PHONE
+        value: "+233 302 000 000"
+      - key: HMS_CURRENCY
+        value: "GHS"
+      - key: HMS_CURRENCY_SYMBOL
+        value: "GHS"
