@@ -118,6 +118,13 @@ class HmsRequirementsTest extends TestCase
         $this->assertDatabaseHas('rooms', ['id' => $room->id, 'status' => 'available']);
     }
 
+    /** @test */
+    public function fr_2_2_housekeeping_can_view_rooms_index()
+    {
+        $response = $this->actingAs($this->housekeeper)->get('/rooms');
+        $response->assertStatus(200);
+    }
+
     // ==========================================
     // Guest Management (FR-3.1, FR-3.2, FR-3.3)
     // ==========================================

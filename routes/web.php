@@ -48,9 +48,9 @@ Route::middleware('auth')->group(function () {
     });
 
     // ----------------------------------------------------------
-    // Rooms (Manager, Admin, Receptionist read — FR-2.1, FR-2.2)
+    // Rooms (Manager, Admin, Receptionist, Housekeeping read — FR-2.1, FR-2.2)
     // ----------------------------------------------------------
-    Route::middleware('role:admin|manager|receptionist')->group(function () {
+    Route::middleware('role:admin|manager|receptionist|housekeeping')->group(function () {
         Route::get('rooms', [RoomController::class, 'index'])->name('rooms.index');
         Route::get('rooms/{room}', [RoomController::class, 'show'])->name('rooms.show');
     });
