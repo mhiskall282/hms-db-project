@@ -52,6 +52,15 @@ class CreateBookingAction
             // Update room status to reserved
             $room->update(['status' => 'reserved']);
 
+            // Send confirmation notification if guest email is present (FR-4.5)
+            if ($booking->guest && $booking->guest->email) {
+                try {
+                    $booking->guest->notify(new \App\Notifications\BookingConfirmationNotification($booking));
+                } catch (\Throwable $e) {
+                    // Suppress mail transport exceptions in local/student environments
+                }
+            }
+
             return $booking;
         });
     }
