@@ -21,11 +21,15 @@ fi
 
 # Clear any stale config cache first
 php artisan config:clear || true
+php artisan route:clear || true
+php artisan view:clear || true
 
-# Ensure valid APP_KEY exists
+# Validate and force a proper base64 APP_KEY
 if [ -z "$APP_KEY" ] || ! echo "$APP_KEY" | grep -q "^base64:"; then
-    echo "Generating base64 application key..."
-    php artisan key:generate --force
+    echo "Generating fresh base64 application key..."
+    NEW_KEY=$(php artisan key:generate --show --no-interaction)
+    export APP_KEY="$NEW_KEY"
+    echo "Exported valid APP_KEY to container environment."
 fi
 
 # Run migrations automatically
