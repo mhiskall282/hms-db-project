@@ -62,7 +62,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="text-center py-8 text-gray-500">No guests found. Click "Register New Guest" to add one.</td>
+                        <td colspan="7" class="text-center py-8 text-gray-500">No guests found. Click "Register New Guest" to add one.</td>
                     </tr>
                     @endforelse
                 </tbody>

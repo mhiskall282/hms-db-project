@@ -32,24 +32,48 @@
 @layer components {
   /* ─── Sidebar ─── */
   .sidebar {
-    @apply bg-primary w-64 min-h-screen flex flex-col fixed left-0 top-0 z-40 transition-transform duration-300 -translate-x-full lg:translate-x-0;
+    @apply bg-primary w-64 h-screen h-[100dvh] max-h-screen flex flex-col fixed left-0 top-0 z-40 transition-transform duration-300 -translate-x-full lg:translate-x-0 overflow-hidden shadow-2xl;
   }
 
   .sidebar.mobile-open {
-    @apply translate-x-0 shadow-2xl;
+    @apply translate-x-0;
   }
 
   .sidebar-logo {
-    @apply px-6 py-5 border-b border-primary-light;
+    @apply px-6 py-4 border-b border-primary-light/60 shrink-0;
   }
 
   .sidebar-nav-item {
-    @apply flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-primary-light
-           transition-colors duration-150 text-sm font-medium cursor-pointer no-underline;
+    @apply flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-gray-300 hover:text-white hover:bg-primary-light/70
+           transition-all duration-150 text-xs font-medium cursor-pointer no-underline;
   }
 
   .sidebar-nav-item.active {
-    @apply bg-accent text-primary font-semibold;
+    @apply bg-accent text-primary font-bold shadow-sm;
+  }
+
+  /* ─── Custom Sidebar Scrollbar ─── */
+  .custom-sidebar-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(242, 169, 59, 0.4) rgba(10, 38, 71, 0.4);
+  }
+
+  .custom-sidebar-scroll::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  .custom-sidebar-scroll::-webkit-scrollbar-track {
+    background: rgba(7, 26, 51, 0.4);
+    border-radius: 4px;
+  }
+
+  .custom-sidebar-scroll::-webkit-scrollbar-thumb {
+    background: rgba(242, 169, 59, 0.4);
+    border-radius: 4px;
+  }
+
+  .custom-sidebar-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(242, 169, 59, 0.8);
   }
 
   /* ─── Buttons ─── */
